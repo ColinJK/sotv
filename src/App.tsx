@@ -2,11 +2,10 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   Heart, Shield, Sword, Zap, ChevronRight, Skull, 
   User, Eye, Flame, Move, Hexagon, Store, 
-  Play, Settings, Volume2, Maximize, Download, Upload, 
-  HelpCircle, Backpack, X, Sparkles, Ghost, Trash2,
+  Play, Settings, Volume2, HelpCircle, Backpack, X, Sparkles, Ghost, Trash2,
   Crosshair, Crown, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Hand,
   Save, RotateCcw, MousePointer2, Monitor, Snowflake, Activity,
-  Droplet, Layers, BookOpen, Anchor
+  Droplet, BookOpen
 } from 'lucide-react';
 
 // --- Constants & Config ---
@@ -145,7 +144,6 @@ class AudioEngine {
 const audio = new AudioEngine();
 
 // --- Types ---
-type Position = { x: number; y: number };
 type EntityType = 'player' | 'enemy' | 'item' | 'stairs' | 'dummy';
 type Rarity = keyof typeof RARITIES;
 type ClassType = 'Warrior' | 'Rogue' | 'Mage';
@@ -400,7 +398,6 @@ export default function Roguelite() {
   const [castMode, setCastMode] = useState<string | null>(null);
   const [hoverItem, setHoverItem] = useState<{item: any, x: number, y: number} | null>(null);
   const [shopTab, setShopTab] = useState<'upgrades' | 'cosmetics'>('upgrades');
-  const [dragSource, setDragSource] = useState<{ type: 'inventory' | 'equipment', index?: number, slot?: string } | null>(null);
 
   const [saveData, setSaveData] = useState({
       voidEssence: 0,
@@ -1063,7 +1060,6 @@ export default function Roguelite() {
   const handleDragStart = (e: React.DragEvent, type: 'inventory' | 'equipment', index?: number, slot?: string) => {
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('source', JSON.stringify({ type, index, slot }));
-      setDragSource({ type, index, slot });
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -1141,7 +1137,6 @@ export default function Roguelite() {
               advanceTutorial('equip');
           } else addLog("Wrong Slot!");
       }
-      setDragSource(null);
   };
 
   const handlePickup = useCallback(() => {
@@ -1611,7 +1606,8 @@ export default function Roguelite() {
                           <div className="flex gap-4 mb-6 justify-center bg-slate-800/50 p-4 rounded">
                               {['weapon', 'armor', 'accessory'].map(type => {
                                   const eqItem = player.equipment[type as keyof typeof player.equipment];
-                                  const isTutorialTarget = gameState === 'TUTORIAL' && TUTORIAL_STEPS[tutorialStep]?.highlight === 'equip_slot';
+                                  // CHANGE: use dungeonLevel === 0 for tutorial check
+                                  const isTutorialTarget = dungeonLevel === 0 && TUTORIAL_STEPS[tutorialStep]?.highlight === 'equip_slot';
                                   
                                   return (
                                       <div key={type} 
@@ -1708,7 +1704,8 @@ export default function Roguelite() {
                                                        const next = node.effect ? node.effect(p) : p;
                                                        return { ...next, skillPoints: p.skillPoints - node.cost, unlockedSkills: [...p.unlockedSkills, node.id] };
                                                    });
-                                                   if (gameState === 'TUTORIAL' && TUTORIAL_STEPS[tutorialStep]?.check === 'learn_skill') {
+                                                   // CHANGE: use dungeonLevel === 0 for tutorial check
+                                                   if (dungeonLevel === 0 && TUTORIAL_STEPS[tutorialStep]?.check === 'learn_skill') {
                                                        advanceTutorial('learn_skill');
                                                    }
                                                }
