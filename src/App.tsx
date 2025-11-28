@@ -696,7 +696,7 @@ export default function Roguelite() {
              id: uuid(), type: 'enemy', x: Math.floor(r.x + rand(1, r.w - 2)), y: Math.floor(r.y + rand(1, r.h - 2)), 
              name, hp, maxHp: hp,
              stats: { str: 2 + (isBoss?5:0), dex: 1, con: 2, int: 0 }, xpReward: isBoss ? 200 : 10 + Math.floor(effectiveLevel),
-             symbol, color, behavior: type, effects: []
+             symbol, color, behavior: type, effects: [], level: Math.floor(effectiveLevel)
            });
         }
         if (Math.random() > 0.7 && !isFinal) {
